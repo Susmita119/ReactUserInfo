@@ -1,7 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch
+} from "react-router-dom";
 import '../style.css'
+import SignIn from '../../Containers/SignIn/index.js'
 import CustomButton from  '../../Components/Shared/Button/index.js'
 import CustomInput from '../../Components/Shared/Input/index.js'
 import { Button } from 'reactstrap';
@@ -10,7 +18,7 @@ import { Button } from 'reactstrap';
 //<CustomButton name="admin..." /> 
 // <h1>{this.state.logins[0].pass}</h1>
 //<h1>{this.state.isAdmin ? "yes" : "no"}</h1>
-         
+//<CustomInput getUser = {this.getUser} />        
 
 
 
@@ -19,13 +27,10 @@ constructor(props){
 super(props);
 
 this.state = {
-admin : [
-{
-  userName : "admin",
-  ppassword : "1111"
-}
-],
-logins :[],
+  
+  userName: "",
+  password: "",
+  
 isAdmin : false
 };
 
@@ -33,69 +38,71 @@ console.log("in constructor");
 }
 
 
-getUser = (e) => {
+handleChange= event =>{
+  event.preventDefault();
+  this.setState(
+      {
+       [event.target.name] : event.target.value 
+      }
 
-  /*fetch("http://10.0.2.252:5000/users/signIn",{
-    method: "POST",
+  );
+     
+};
+
+
+handleClicked = event =>{
+  event.preventDefault();
+  const loggedUser ={
+    userName : this.state.userName,
+    password : this.state.password
+  };
+
+  axios.post("http://10.0.2.252:5000/users/signIn",loggedUser,{
     headers: {
-      Accept: "application/json",
       "Content-Type": "application/json"
-    },
-    body :JSON.stringify({
-      userName : 
-
-    })
-
+    }
 
   })
-  .then()*/
-
-
-
-  console.log("in getuser fn...........................");
-  e.preventDefault();
-  const user=e.target.elements.username.value;
-  axios.get("http://localhost:5000/users/signIn")
-  .then((res)=>{
-    console.log(res);
+  .then(Response =>{
+    console.log(Response);
+    console.log("Data Value of token ",Response.data.accessToken);
+  })
+  .catch(error => {
+    console.log(error.response);
   });
-  console.log(e);
-  console.log(user);
-}
+  
+  console.log(loggedUser);
+};
 
-componentDidMount(){
-console.log("in didmount");
-axios.get("https://jsonplaceholder.typicode.com/users")
-.then(function(response){ 
-  //this.setState({logins : response.data});
-  console.log(response);
-});
-
-}
 render(){
   console.log("in render");
 return(
 <div className="Login">
         <div>
-        <CustomInput getUser = {this.getUser} />
-
-
+          <form>
+         <br></br>
+         <label>User Name : </label>
+          <input
+            type="text"
+            name="userName"
+            data-test="userName"
+            onChange={this.handleChange}
+          />
           <br></br>
-          <label htmlFor="email">Email : </label>
-          <input name="email" type="text" placeholder="Enter your email" />
-          <br></br>
-          <label htmlFor="email">Password : </label>
+          <label >Password : </label>
           <input
             name="password"
             type="password"
             placeholder="Enter your password"
+            onChange={this.handleChange}
           />
           <br></br>
-          <button type="submit" >
-            Login
-          </button>
+          <button type="submit" onClick={this.handleClicked} >Login</button> <Link to="/SignIn">Create a account</Link>
+          <switch>
+            <Route exact path="/SignIn" component={SignIn}></Route> 
+          </switch>
                     
-          
+          </form>
         </div>
 
 </div>
